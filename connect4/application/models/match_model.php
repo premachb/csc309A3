@@ -41,6 +41,29 @@ class Match_model extends CI_Model {
 		$this->db->where('id',$id);
 		return $this->db->update('match',array('match_status_id'=>$status));
 	}
+
+	function getMatchState($id){
+		$query = $this->db->query('select board_state from `match` where id = ' . $id);
+		$this->load->database();
+
+		if($query->num_rows > 0){
+			foreach($query->result() as $row){
+				echo $row->board_state;
+			}
+		}
+		else{
+			echo "no board";
+		}
+	}
+
+	function updateMatchState($id, $board_state){
+		$this->db->where('id',$id);
+		return $this->db->update('match', array('board_state'=>$board_state));
+	}
+
+	function isPlayersTurn($id){
+
+	}
 	
 }
 ?>
