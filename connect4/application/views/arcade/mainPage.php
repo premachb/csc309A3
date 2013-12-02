@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html>
@@ -35,6 +34,8 @@
 
 	<div>
 	Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
+	
+	
 	</div>
 	
 <?php 
