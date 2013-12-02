@@ -89,8 +89,8 @@ class Arcade extends CI_Controller {
 	    // 0 represents blank spot, 1 represents user 1 chip, 2 represents user 2 chip
 	    // this will work as a key-value pair board['column'] = array of rows 
 	    $board = array();
-	    for($i = 1; $i <= 7; $i++){
-	    	$board[$i] = array(0, 0, 0, 0, 0, 0, 0);
+	    for($i = 0; $i < 7; $i++){
+	    	$board[$i] = array(0, 0, 0, 0, 0, 0);
 	    }
 
 	    $board_state['board'] = $board;

@@ -5,12 +5,14 @@
 	<head>
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
 	<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/kineticjs/4.6.0/kinetic.min.js"></script>
 	<script>
 
 		var otherUser = "<?= $otherUser->login ?>";
 		var user = "<?= $user->login ?>";
 		var status = "<?= $status ?>";
 		var id = "<?= $user->id ?>";
+		var oppenent_id = "<?= $otherUser->id ?>";
 
 		$(function(){
 			$('body').everyTime(2000,function(){
@@ -53,12 +55,93 @@
 			$('#board').everyTime(1000, function(){
 				if(status == 'playing'){
 					$.getJSON('<?= base_url() ?>board/getMatchState/<?php echo ($match->id); ?>', function(data, text){
-						if(data.turn == id){
-							$('#board').html('<p>Its your turn</p>');
+						// If we get a board state from the DB, we can keep drawing the game.
+						if(data && data.board){
+							var board = data.board;
+							var x = 30;
+							var y = 20;
+
+							var stage = new Kinetic.Stage({
+						        container: 'board',
+						        width: 600,
+						        height: 600
+						    });
+
+						    var layer = new Kinetic.Layer();
+							for(var i = 0; i < 7; i++){
+								for(var j = 0; j < board[i].length; j++){
+									if(board[i][j] == 0){
+										var color = 'white';
+									}
+
+									else if(data.board[i][j] == <?php echo $match->user1_id?>){
+										var color = 'red';
+									}
+
+									else if(data.board[i][j] == <?php echo $match->user2_id?>){
+										var color = 'yellow';
+									}
+
+										var circle = new Kinetic.Circle({
+									        x: x,
+									        y: y,
+									        radius: 10,
+									        fill: color,
+									        stroke: 'black',
+									        strokeWidth: 4,
+									        column: i
+								      	});
+
+								      	
+
+										// Attach click event to each circle seperately 
+								      	circle.on('click', function(){
+								      		var mouseXY = stage.getMousePosition();
+								      		column_clicked = Math.floor(mouseXY.x / 30);
+								   
+								      		if(column_clicked - 1 < 0){
+								      			column_clicked = 0;
+								      		}
+								      		else{
+								      			column_clicked = column_clicked - 1;
+								      		}
+
+								      		console.log(column_clicked);
+
+								      		// It's the users turn and they can actually make a move
+								      		if(data.turn && data.turn == id){
+								      			// PLACE THE CHIP
+								      			var row_iterator = 1;
+								      		
+								      			if(board[column_clicked][row_iterator - 1] != 0){
+								      				console.log('column is full')
+								      			}
+
+								      			else{
+								      				// Iterate down the column until spot is not empty or we reached the bottom
+									      			while(board[column_clicked][row_iterator] == 0 && row_iterator < 6){
+									      				row_iterator++;
+									      			}
+
+									      			board[column_clicked][row_iterator - 1] = id;
+					      			
+									      			$.ajax({
+														type: "POST",
+														url: "<?= base_url() ?>board/updateMatchState/<?php echo ($match->id); ?>",
+														data: { board: board, turn: oppenent_id }
+													});
+								      			}
+								      		}
+								      	});
+										layer.add(circle);
+										y+= 30;
+								}
+
+								y = 20;
+								x += 30;
 						}
-						else{
-							$('#board').html('<p>Its not your turn</p>');
-						}
+						stage.add(layer);
+					}
 					});
 				}
 			});
@@ -75,7 +158,9 @@
 							alert('its not your turn');
 						}
 					});
-			});			
+			});		
+
+
 		});
 
 		
@@ -98,8 +183,7 @@
 	?>
 	</div>
 
-	<div id='board'>
-	</div>
+	<div id='board'></div>
 
 
 	

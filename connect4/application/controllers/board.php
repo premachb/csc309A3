@@ -153,6 +153,42 @@ class Board extends CI_Controller {
  			//echo 'board doesnt exist';
  		}
  	}
+
+ 	function updateMatchState(){
+ 		$this->load->model('match_model');
+ 		$id = $this->uri->segment(3);
+
+ 		$board = $_POST['board'];
+ 		$turn = $_POST['turn'];
+
+ 		var_dump($board_state);
+ 		var_dump($turn);
+
+ 		$match = $this->match_model->getExclusive($id);
+
+ 		$this->db->trans_begin();
+ 		$board_state = array('board' => $board, 'turn' => $turn);
+ 		$board_state = json_encode($board_state);
+
+ 		$this->match_model->updateMatchState($id, $board_state);
+
+ 		if ($this->db->trans_status() === FALSE) {
+ 			$errormsg = "Transaction error";
+ 			goto transactionerror;
+ 		}
+ 		
+ 		// if all went well commit changes
+ 		$this->db->trans_commit();
+ 		
+ 		echo json_encode(array('status'=>'success'));
+		return;
+		
+		transactionerror:
+		$this->db->trans_rollback();
+		
+		error:
+		echo json_encode(array('status'=>'failure'));
+ 	}
  	
  }
 
