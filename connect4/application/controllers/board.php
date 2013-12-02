@@ -35,6 +35,7 @@ class Board extends CI_Controller {
 	    	}
 	    	else if ($user->user_status_id == User::PLAYING) {
 	    		$match = $this->match_model->get($user->match_id);
+	    		$data['match'] = $match;
 	    		if ($match->user1_id == $user->id)
 	    			$otherUser = $this->user_model->getFromId($match->user2_id);
 	    		else
@@ -44,6 +45,7 @@ class Board extends CI_Controller {
 	    	$data['user']=$user;
 	    	$data['otherUser']=$otherUser;
 	    	
+	    	
 	    	switch($user->user_status_id) {
 	    		case User::PLAYING:	
 	    			$data['status'] = 'playing';
@@ -52,8 +54,8 @@ class Board extends CI_Controller {
 	    			$data['status'] = 'waiting';
 	    			break;
 	    	}
-	    	
-		$this->load->view('match/board',$data);
+
+			$this->load->view('match/board',$data);
     }
 
  	function postMsg() {
@@ -137,6 +139,19 @@ class Board extends CI_Controller {
 		
 		error:
 		echo json_encode(array('status'=>'failure','message'=>$errormsg));
+ 	}
+
+ 	function getMatchState(){
+ 		$this->load->model('match_model');
+ 		$id = $this->uri->segment(3);
+
+ 		$state = $this->match_model->getMatchState($id);
+ 		if(isset($state)){
+ 			//var_dump($state);
+ 		}
+ 		else{
+ 			//echo 'board doesnt exist';
+ 		}
  	}
  	
  }

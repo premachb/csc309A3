@@ -10,7 +10,8 @@
 		var otherUser = "<?= $otherUser->login ?>";
 		var user = "<?= $user->login ?>";
 		var status = "<?= $status ?>";
-		
+		var id = "<?= $user->id ?>";
+
 		$(function(){
 			$('body').everyTime(2000,function(){
 					if (status == 'waiting') {
@@ -47,7 +48,37 @@
 						});
 				return false;
 				});	
+
+			// Check the current state of the board every second
+			$('#board').everyTime(1000, function(){
+				if(status == 'playing'){
+					$.getJSON('<?= base_url() ?>board/getMatchState/<?php echo ($match->id); ?>', function(data, text){
+						if(data.turn == id){
+							$('#board').html('<p>Its your turn</p>');
+						}
+						else{
+							$('#board').html('<p>Its not your turn</p>');
+						}
+					});
+				}
+			});
+			
+			// If user clicks on the board
+			$('#board').click(function(){
+				$.getJSON('<?= base_url() ?>board/getMatchState/<?php echo ($match->id); ?>', function(data, text){
+						if(data.turn == id){
+							alert("its your turn");
+							// If its the users turn then we need to change the turn to the other user
+						}
+						else{
+							// Do nothing, its not this users turn.
+							alert('its not your turn');
+						}
+					});
+			});			
 		});
+
+		
 	
 	</script>
 	</head> 
@@ -66,6 +97,11 @@
 			echo "Wating on " . $otherUser->login;
 	?>
 	</div>
+
+	<div id='board'>
+	</div>
+
+
 	
 <?php 
 	

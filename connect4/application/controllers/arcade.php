@@ -57,15 +57,14 @@ class Arcade extends CI_Controller {
     }
     
     function acceptInvitation() {
-	    	$user = $_SESSION['user'];
+	    $user = $_SESSION['user'];
 	    	 
-	    	$this->load->model('user_model');
-	    	$this->load->model('invite_model');
-	    	$this->load->model('match_model');
+	    $this->load->model('user_model');
+	    $this->load->model('invite_model');
+	    $this->load->model('match_model');
 	    	
 	    	
-	    	$user = $this->user_model->get($user->login);
-	    	
+	    $user = $this->user_model->get($user->login);
 	    $invite = $this->invite_model->get($user->invite_id);
 	    $hostUser = $this->user_model->getFromId($invite->user1_id);
 
@@ -81,6 +80,31 @@ class Arcade extends CI_Controller {
 	    $match = new Match();
 	    $match->user1_id = $user->id;
 	    $match->user2_id = $hostUser->id;
+
+	     //BOARD CREATION
+	    // create board and set turn to user who initiated the invite
+	    $board_state = array();
+
+	    // coordinates are as follows (x, y) there are 7 numbers on x-axis and 6 numbers on the y-axis
+	    // 0 represents blank spot, 1 represents user 1 chip, 2 represents user 2 chip
+	    // this will work as a key-value pair board['column'] = array of rows 
+	    $board = array();
+	    for($i = 1; $i <= 7; $i++){
+	    	$board[$i] = array(0, 0, 0, 0, 0, 0, 0);
+	    }
+
+	    $board_state['board'] = $board;
+	    $board_state['turn'] = $match->user2_id;
+
+	    $json_state = json_encode($board_state);
+	    $match->board_state = $json_state;
+
+	    $this->match_model->insert($match);
+	    if ($this->db->trans_status() === FALSE){
+	    		goto transactionerror;
+	    }
+	    
+
 	    $this->match_model->insert($match);
 	    $matchId = mysql_insert_id();
 
@@ -90,11 +114,8 @@ class Arcade extends CI_Controller {
 	    
 	    $this->user_model->updateMatch($user->id,$matchId);
 	    $this->user_model->updateMatch($hostUser->id,$matchId);
-	     
-	    
-	    if ($this->db->trans_status() === FALSE)
-	    		goto transactionerror;
-	    
+
+	   
 	    // if all went well commit changes
 	    $this->db->trans_commit();
 	    
@@ -104,12 +125,11 @@ class Arcade extends CI_Controller {
 	    
 	    // something went wrong
 	    transactionerror:
-	    $this->db->trans_rollback();
+	    	$this->db->trans_rollback();
 
 	    echo json_encode(array('status'=>'failure'));
+	}
 	     
-	    
-    }
     
 	function declineInvitation() {
 		$user = $_SESSION['user'];
@@ -153,7 +173,6 @@ class Arcade extends CI_Controller {
 		$this->load->model('invite_model');
 	
 		$user = $this->user_model->get($user->login);
-	
 		$invite = $this->invite_model->get($user->invite_id);
 
 		switch($invite->invite_status_id) {
@@ -234,6 +253,7 @@ class Arcade extends CI_Controller {
 	transactionerror:
 	nouser2:	
 		$this->db->trans_rollback();
+
 	
     	loginerror:
     	
@@ -245,7 +265,6 @@ class Arcade extends CI_Controller {
     			$this->db->trans_rollback();
     		}
     		
-    }
- 
- }
+ 	}
+}
 
