@@ -48,33 +48,19 @@
 	echo form_label('Email');
 	echo form_error('email');
 	echo form_input('email',set_value('email'),"required");
-	
 ?>	
 
 	<br>
 	<img id="captcha" src="/connect4/securimage/securimage_show.php" alt="CAPTCHA Image" />
 	
-	<br>
-	<input type="text" name="captcha_code" size="10" maxlength="6" />
+<?php
+	echo form_error('captcha_code');
+	echo form_input('captcha_code', set_value('captcha_code'), "size='10' maxlength='6' required");
+?>
 
 	<a href="#" onclick="document.getElementById('captcha').src = '/connect4/securimage/securimage_show.php?' + Math.random(); return false">[ Different Image ]</a>
 	
-	<script>
-	if ($securimage->check($_POST['captcha_code']) == false) {
-	  // the code was incorrect
-	  // you should handle the error so that the form processor doesn't continue
-	
-	  // or you can use the following code if there is no validation or you do not know how
-	  echo "The security code entered was incorrect.<br /><br />";
-	  echo "Please go <a href='javascript:history.go(-1)'>back</a> and try again.";
-	  exit;
-	}
-	</script>
-	
 	<?php
-		include_once $_SERVER['DOCUMENT_ROOT'] . '/connect4/securimage/securimage.php';
-
-		$securimage = new Securimage();
 		
 		echo form_submit('submit', 'Register');
 		echo form_close();

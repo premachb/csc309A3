@@ -76,9 +76,9 @@ class Account extends CI_Controller {
 	    	$this->form_validation->set_rules('first', 'First', "required");
 	    	$this->form_validation->set_rules('last', 'last', "required");
 	    	$this->form_validation->set_rules('email', 'Email', "required|is_unique[user.email]");
-	    	
-	    
-	    	if ($this->form_validation->run() == FALSE)
+			$this->form_validation->set_rules('captcha_code', 'Captcha Test','callback_captcha_check');		
+			
+	     	if ($this->form_validation->run() == FALSE)
 	    	{
 	    		$this->load->view('account/newForm');
 	    	}
@@ -100,7 +100,27 @@ class Account extends CI_Controller {
 	    		
 	    		$this->load->view('account/loginForm');
 	    	}
+			
     }
+
+	public function captcha_check($str)
+	{
+		include_once $_SERVER['DOCUMENT_ROOT'] . '/connect4/securimage/securimage.php';
+
+		$securimage = new Securimage();
+			
+		if ($securimage->check($str) == false) {
+			// the code was incorrect
+			// you should handle the error so that the form processor doesn't continue
+				
+			// or you can use the following code if there is no validation or you do not know how
+			$this->form_validation->set_message('captcha_check', 'The Captcha input does not match the image');
+			return FALSE;
+			}
+		else {
+			return TRUE;
+		}
+	}
 
     
     function updatePasswordForm() {
