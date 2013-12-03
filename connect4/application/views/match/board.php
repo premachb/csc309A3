@@ -25,10 +25,13 @@
 								if (data && data.status=='accepted') {
 									status = 'playing';
 									$('#status').html('Playing ' + otherUser);
+									window.location.replace('<?= base_url() ?>board/index');
 								}
 								
 						});
 					}
+					
+
 					var url = "<?= base_url() ?>board/getMsg";
 					$.getJSON(url, function (data,text,jqXHR){
 						if (data && data.status=='success') {
@@ -55,7 +58,19 @@
 			$('#board').everyTime(1000, function(){
 				if(status == 'playing'){
 					$.getJSON('<?= base_url() ?>board/getMatchState/<?php echo ($match->id); ?>', function(data, text){
+						// First check the status of the match, if a player has won we should notify and send both players back to the lobby
+						
+
 						// If we get a board state from the DB, we can keep drawing the game.
+						if(data && data.turn){
+							if(data.turn == id){
+								$('#turnIndicator').html('Its your turn!');
+							}
+							else{
+								$('#turnIndicator').html('Its not your turn!');
+
+							}
+						}
 						if(data && data.board){
 							var board = data.board;
 							var x = 30;
@@ -64,7 +79,7 @@
 							var stage = new Kinetic.Stage({
 						        container: 'board',
 						        width: 600,
-						        height: 600
+						        height: 200
 						    });
 
 						    var layer = new Kinetic.Layer();
@@ -93,11 +108,10 @@
 								      	});
 
 								      	
-
 										// Attach click event to each circle seperately 
 								      	circle.on('click', function(){
 								      		var mouseXY = stage.getMousePosition();
-								      		column_clicked = Math.floor(mouseXY.x / 30);
+								      		column_clicked = Math.ceil(mouseXY.x / 30);
 								   
 								      		if(column_clicked - 1 < 0){
 								      			column_clicked = 0;
@@ -124,12 +138,17 @@
 									      			}
 
 									      			board[column_clicked][row_iterator - 1] = id;
-					      			
+									      			var lastChip = [column_clicked, row_iterator - 1];
+					      							
+					      							// Send new board state to the DB and change turns 
 									      			$.ajax({
 														type: "POST",
 														url: "<?= base_url() ?>board/updateMatchState/<?php echo ($match->id); ?>",
-														data: { board: board, turn: oppenent_id }
+														data: {board: board, turn: oppenent_id, lastChip: lastChip, lastUser: id},
 													});
+
+													$
+
 								      			}
 								      		}
 								      	});
@@ -142,25 +161,24 @@
 						}
 						stage.add(layer);
 					}
+
+					if(data.match_status != 1){
+							if(data.match_status == 2 && (<?php echo $match->user1_id?> == id)){
+								alert("You won!");
+								window.location.replace('<?= base_url() ?>arcade');
+							}
+							else if(data.match_status = 3 && (<?php echo $match->user2_id?> == id)){
+								alert("You won!");
+								window.location.replace('<?= base_url() ?>arcade');
+							}
+							else{
+								alert("You lost!");
+								window.location.replace('<?= base_url() ?>arcade');
+							}
+					}
 					});
 				}
 			});
-			
-			// If user clicks on the board
-			$('#board').click(function(){
-				$.getJSON('<?= base_url() ?>board/getMatchState/<?php echo ($match->id); ?>', function(data, text){
-						if(data.turn == id){
-							alert("its your turn");
-							// If its the users turn then we need to change the turn to the other user
-						}
-						else{
-							// Do nothing, its not this users turn.
-							alert('its not your turn');
-						}
-					});
-			});		
-
-
 		});
 
 		
@@ -183,6 +201,7 @@
 	?>
 	</div>
 
+	<div id='turnIndicator'></div>
 	<div id='board'></div>
 
 

@@ -146,8 +146,13 @@ class Board extends CI_Controller {
  		$id = $this->uri->segment(3);
 
  		$state = $this->match_model->getMatchState($id);
+ 		$match = $this->match_model->get($id);
+
+ 		$decoded = json_decode($state, TRUE);
+ 		$decoded['match_status'] = $match->match_status_id;
+
  		if(isset($state)){
- 			//var_dump($state);
+ 			echo json_encode($decoded);
  		}
  		else{
  			//echo 'board doesnt exist';
@@ -156,13 +161,13 @@ class Board extends CI_Controller {
 
  	function updateMatchState(){
  		$this->load->model('match_model');
+ 		$this->load->model('user_model');
  		$id = $this->uri->segment(3);
 
  		$board = $_POST['board'];
  		$turn = $_POST['turn'];
-
- 		var_dump($board_state);
- 		var_dump($turn);
+ 		$lastChip = $_POST['lastChip'];
+ 		$lastUser = $_POST['lastUser'];
 
  		$match = $this->match_model->getExclusive($id);
 
@@ -176,15 +181,34 @@ class Board extends CI_Controller {
  			$errormsg = "Transaction error";
  			goto transactionerror;
  		}
+
+ 		// On Update Check for a Win.
+ 		$winner = $this->match_model->checkForWin($board, $lastChip, $lastUser);
  		
- 		// if all went well commit changes
+ 		// Player has Won, set the users status to available and send them back home.
+ 		if(isset($winner)){
+ 			$user1 = $match->user1_id;
+ 			$user2 = $match->user2_id;
+
+ 			// Update status of the match. 
+ 			if($match->user1_id == $winner){
+ 				$this->match_model->updateStatus($id, 2);
+ 			}
+ 			else{
+ 				$this->match_model->updateStatus($id, 3);
+ 			}
+ 			// Update status of the users invovled in the match
+ 			$this->user_model->updateStatus($user1, 2);
+ 			$this->user_model->updateStatus($user2, 2);
+ 		}
+ 		
  		$this->db->trans_commit();
- 		
- 		echo json_encode(array('status'=>'success'));
 		return;
-		
+
 		transactionerror:
 		$this->db->trans_rollback();
+
+		
 		
 		error:
 		echo json_encode(array('status'=>'failure'));
