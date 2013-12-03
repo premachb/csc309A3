@@ -16,8 +16,8 @@ class Board extends CI_Controller {
  	    	
 	    	return call_user_func_array(array($this, $method), $params);
     }
-    
-    
+
+      
     function index() {
 		$user = $_SESSION['user'];
     		    	
@@ -54,6 +54,7 @@ class Board extends CI_Controller {
 	    			$data['status'] = 'waiting';
 	    			break;
 	    	}
+
 
 			$this->load->view('match/board',$data);
     }
