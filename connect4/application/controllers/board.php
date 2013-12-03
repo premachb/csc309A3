@@ -44,6 +44,7 @@ class Board extends CI_Controller {
 	    	
 	    	$data['user']=$user;
 	    	$data['otherUser']=$otherUser;
+	    	$data['title'] = "Connect 4 Match - In session";
 	    	
 	    	
 	    	switch($user->user_status_id) {
