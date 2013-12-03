@@ -62,98 +62,48 @@ class Match_model extends CI_Model {
 	}
 
 	function checkForWin($board, $lastChip, $lastUser){
-		// The idea behind this algorithm is to not check the whole board each time
-		// Only check the region in which the last chip was placed (Check horizontally, vertically and diagonally)
-
 		$counter = 0;
 
-		// Check 3 spots in both vertical directions
-		for($i = intval($lastChip[1]); $i < intval($lastChip[1]) + 4; $i++){
-			if(isset($board[intval($lastChip[0])][$i])){
-				if($board[intval($lastChip[0])][$i] == $lastUser){
+		// Check verticals for current user victory
+		for($i = 0; $i < 7; $i++){
+			for($j = 0; $j < 6; $j++){
+				if($board[$i][$j] == $lastUser){
 					$counter++;
 				}
 				else{
-					// No match
 					$counter = 0;
-					break;
+				}
+
+				if($counter == 4){
+					return $lastUser;
+				}
+			}
+
+			if($counter < 4){
+				$counter = 0;
+			}
+		}
+
+		// Check Horizonatals for current user victory
+		for($i = 0; $i < 6; $i++){
+			for($j = 0; $j < 7; $j++){
+				if($board[$j][$i] == $lastUser){
+					$counter++;
+				}
+				else{
+					$counter = 0;
+				}
+
+				if($counter == 4){
+					return $lastUser;
 				}
 			}	
-			else{
+			if($counter < 4){
 				$counter = 0;
-				break;
-			}
-
-			if($counter == 4){
-				return $lastUser;
-			}
-		}
-
-		for($i = intval($lastChip[1]); $i > intval($lastChip[1]) - 4; $i--){
-			if(isset($board[intval($lastChip[0])][$i])){
-				if($board[intval($lastChip[0])][$i] == $lastUser){
-					$counter++;
-				}
-				else{
-					$counter = 0;
-					break;
-				}
-			}	
-			else{
-				$counter = 0;
-				break;
-			}
-
-			if($counter == 4){
-				return $lastUser;
-			}
-		}
-
-		// HORIZONTAL CHECK 
-		// Check 3 spots right
-		for($i = intval($lastChip[0]); $i < intval($lastChip[0]) + 4; $i++){
-			if(isset($board[$i][intval($lastChip[1])])){
-				if($board[$i][intval($lastChip[1])] == $lastUser){
-					$counter++;
-				}
-				else{
-					$counter = 0;
-					break;
-				}
-			}
-			else{
-				$counter = 0;
-				break;
-			}
-
-			if($counter == 4){
-				return $lastUser;
-			}
-		}
-
-		// Check 3 spots left
-		for($i = intval($lastChip[0]); $i > intval($lastChip[0]) - 4; $i--){
-			if(isset($board[$i][intval($lastChip[1])])){
-				if($board[$i][intval($lastChip[1])] == $lastUser){
-					$counter++;
-				}
-				else{
-					$counter = 0;
-					break;
-				}
-			}
-			else{
-				$counter = 0;
-				break;
-			}
-
-			if($counter == 4){
-				return $lastUser;
-			}
+			}		
 		}
 
 		return null;
-		
 	}
 
 	function isPlayersTurn($id){
