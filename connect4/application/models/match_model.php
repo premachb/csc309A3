@@ -109,7 +109,7 @@ class Match_model extends CI_Model {
 		for ($j = 1; $j < 7 ; $j++){ 
 			for ($i = 0; $i < 7 - $j; $i++){
 
-				if($board[$j][$i + $j] == $lastUser){
+				if($board[$i + $j][$i] == $lastUser){
 					$counter++;
 				}
 				else{
@@ -129,8 +129,8 @@ class Match_model extends CI_Model {
 	
 		for ($j = 0; $j < 6 ; $j++){ 
 			for ($i = 0; $i < 7 - $j - 1; $i++){
-				console.log($i + $j, $i);
-				if($board[$i + $j][$i] == $lastUser){
+
+				if($board[$i][$i + $j] == $lastUser){
 					$counter++;
 				}
 				else{
@@ -150,7 +150,7 @@ class Match_model extends CI_Model {
 	
 		for ($j = 0; $j < 6 ; $j++){ 
 			for ($i = 0; $i < $j + 1; $i++){
-				if($board[$j - $i][$i] == $lastUser){
+				if($board[$i][$j - $i] == $lastUser){
 					$counter++;
 				}
 				else{
@@ -170,7 +170,7 @@ class Match_model extends CI_Model {
 	
 		for ($j = 1; $j < 7 ; $j++){ 
 			for ($i = 0; $i < 7 - $j; $i++){
-				if($board[$j + $i][5 - $i] == $lastUser){
+				if($board[5 - $i][$j - $i] == $lastUser){
 					$counter++;
 				}
 				else{
