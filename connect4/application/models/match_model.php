@@ -63,6 +63,7 @@ class Match_model extends CI_Model {
 
 	function checkForWin($board, $lastChip, $lastUser){
 		$counter = 0;
+		//current number of links
 
 		// Check verticals for current user victory
 		for($i = 0; $i < 7; $i++){
@@ -102,13 +103,92 @@ class Match_model extends CI_Model {
 				$counter = 0;
 			}		
 		}
+		
+		//first set of Diagonals, starting from [0, 1] to [0, 6], going right down
+		
+		for ($j = 1; $j < 7 ; $j++){ 
+			for ($i = 0; $i < 7 - $j; $i++){
 
+				if($board[$j][$i + $j] == $lastUser){
+					$counter++;
+				}
+				else{
+					$counter = 0;
+				}
+
+				if($counter == 4){
+					return $lastUser;
+				}
+			}	
+			if($counter < 4){
+				$counter = 0;
+			}	
+		}
+		
+		//second set of Diagonals, starting from [0, 0] to [5, 0] going right down
+	
+		for ($j = 0; $j < 6 ; $j++){ 
+			for ($i = 0; $i < 7 - $j - 1; $i++){
+				console.log($i + $j, $i);
+				if($board[$i + $j][$i] == $lastUser){
+					$counter++;
+				}
+				else{
+					$counter = 0;
+				}
+
+				if($counter == 4){
+					return $lastUser;
+				}
+			}	
+			if($counter < 4){
+				$counter = 0;
+			}	
+		}
+	
+		//third set of Diagonals, starting from [0, 0] to [6, 0] going upper right
+	
+		for ($j = 0; $j < 6 ; $j++){ 
+			for ($i = 0; $i < $j + 1; $i++){
+				if($board[$j - $i][$i] == $lastUser){
+					$counter++;
+				}
+				else{
+					$counter = 0;
+				}
+
+				if($counter == 4){
+					return $lastUser;
+				}
+			}	
+			if($counter < 4){
+				$counter = 0;
+			}	
+		}
+	
+		//Fourth set of Diagonals, starting from [1, 5] to [6, 5] going upper right
+	
+		for ($j = 1; $j < 7 ; $j++){ 
+			for ($i = 0; $i < 7 - $j; $i++){
+				if($board[$j + $i][5 - $i] == $lastUser){
+					$counter++;
+				}
+				else{
+					$counter = 0;
+				}
+
+				if($counter == 4){
+					return $lastUser;
+				}
+			}	
+			if($counter < 4){
+				$counter = 0;
+			}	
+		}
+
+		
 		return null;
 	}
 
-	function isPlayersTurn($id){
-
-	}
-	
 }
 ?>		

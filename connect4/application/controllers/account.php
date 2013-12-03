@@ -71,11 +71,11 @@ class Account extends CI_Controller {
     
     function createNew() {
     		$this->load->library('form_validation');
-    	    $this->form_validation->set_rules('username', 'Username', 'required|is_unique[user.login]');
+    	    $this->form_validation->set_rules('username', 'Username', 'required|is_unique[user.login]|xss_clean');
 	    	$this->form_validation->set_rules('password', 'Password', 'required');
-	    	$this->form_validation->set_rules('first', 'First', "required");
-	    	$this->form_validation->set_rules('last', 'last', "required");
-	    	$this->form_validation->set_rules('email', 'Email', "required|is_unique[user.email]");
+	    	$this->form_validation->set_rules('first', 'First', "required|xss_clean");
+	    	$this->form_validation->set_rules('last', 'last', "required|xss_clean");
+	    	$this->form_validation->set_rules('email', 'Email', "required|is_unique[user.email]|xss_clean");
 			$this->form_validation->set_rules('captcha_code', 'Captcha Test','callback_captcha_check');		
 			
 	     	if ($this->form_validation->run() == FALSE)
