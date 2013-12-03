@@ -15,8 +15,7 @@
 		var id = "<?= $user->id ?>";
 		var oppenent_id = "<?= $otherUser->id ?>";
 
-		$(function(){
-			// Check the current state of the board every second
+				// Check the current state of the board every second
 			$('body').everyTime(1000, function(){
 				if(status === "waiting") {
 					$.getJSON('<?= base_url() ?>arcade/checkInvitation',function(data, text, jqZHR){
@@ -34,20 +33,24 @@
 				}
 			});
 
+		$(function(){
+	
+
 			$('#board').everyTime(1000, function(){
 				if(status === "playing"){
 					$.getJSON('<?= base_url() ?>board/getMatchState/<?php echo ($match->id); ?>', function(data, text){
-						// First check the status of the match, if a player has won we should notify and send both players back to the lobby
-						// If we get a board state from the DB, we can keep drawing the game.
+						// Check who's turn it is
 						if(data && data.turn){
 							if(data.turn == id){
-								$('#turnIndicator').html('Its your turn!');
+								$('#turnIndicator').html('Its your turn! Click the column you want to drop a chip in');
 							}
 							else{
-								$('#turnIndicator').html('Its not your turn!');
+								$('#turnIndicator').html('Its not your turn! Wait for the other player to finish their turn');
 
 							}
 						}
+
+						// If we receive a board, start drawing it.
 						if(data && data.board){
 							var board = data.board;
 							var x = 30;
