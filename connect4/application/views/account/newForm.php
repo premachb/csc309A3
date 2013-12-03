@@ -51,14 +51,14 @@
 ?>	
 
 	<br>
-	<img id="captcha" src="/connect4/securimage/securimage_show.php" alt="CAPTCHA Image" />
+	<img id="captcha" src="<?= base_url()?>securimage/securimage_show.php" alt="CAPTCHA Image" />
 	
 <?php
 	echo form_error('captcha_code');
 	echo form_input('captcha_code', set_value('captcha_code'), "size='10' maxlength='6' required");
 ?>
 
-	<a href="#" onclick="document.getElementById('captcha').src = '/connect4/securimage/securimage_show.php?' + Math.random(); return false">[ Different Image ]</a>
+	<a href="#" onclick="document.getElementById('captcha').src = '<?= base_url()?>securimage/securimage_show.php?' + Math.random(); return false">[ Different Image ]</a>
 	
 	<?php
 		
